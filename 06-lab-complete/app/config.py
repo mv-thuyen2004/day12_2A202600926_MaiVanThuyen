@@ -14,14 +14,14 @@ class Settings:
 
     # App
     app_name: str = field(default_factory=lambda: os.getenv("APP_NAME", "Production AI Agent"))
-    app_version: str = field(default_factory=lambda: os.getenv("APP_VERSION", "1.0.0"))
+    app_version: str = field(default_factory=lambda: os.getenv("APP_VERSION", "1.0.2"))
 
     # LLM
     openai_api_key: str = field(default_factory=lambda: os.getenv("OPENAI_API_KEY", ""))
     llm_model: str = field(default_factory=lambda: os.getenv("LLM_MODEL", "gpt-4o-mini"))
 
     # Security
-    agent_api_key: str = field(default_factory=lambda: os.getenv("AGENT_API_KEY", "dev-key-change-me"))
+    agent_api_key: str = field(default_factory=lambda: os.getenv("AGENT_API_KEY", "secret-key-123"))
     jwt_secret: str = field(default_factory=lambda: os.getenv("JWT_SECRET", "dev-jwt-secret"))
     allowed_origins: list = field(
         default_factory=lambda: os.getenv("ALLOWED_ORIGINS", "*").split(",")
@@ -29,16 +29,16 @@ class Settings:
 
     # Rate limiting
     rate_limit_per_minute: int = field(
-        default_factory=lambda: int(os.getenv("RATE_LIMIT_PER_MINUTE", "20"))
+        default_factory=lambda: int(os.getenv("RATE_LIMIT_PER_MINUTE", "10"))
     )
 
     # Budget
     daily_budget_usd: float = field(
-        default_factory=lambda: float(os.getenv("DAILY_BUDGET_USD", "5.0"))
+        default_factory=lambda: float(os.getenv("DAILY_BUDGET_USD", "10.0"))
     )
 
     # Storage
-    redis_url: str = field(default_factory=lambda: os.getenv("REDIS_URL", ""))
+    redis_url: str = field(default_factory=lambda: os.getenv("REDIS_URL", "redis://localhost:6379/0"))
 
     def validate(self):
         logger = logging.getLogger(__name__)
