@@ -1,0 +1,42 @@
+{
+    "DaNang": {
+        "tomorrow": {
+            "temp": 35,
+            "condition": "Mây"
+        },
+        "day_after": {
+            "temp": 32,
+            "condition": "Nắng"
+        }
+    },
+    "HaNoi": {
+        "tomorrow": {
+            "temp": 34,
+            "condition": "Mưa nhẹ"
+        },
+        "day_after": {
+            "temp": 34,
+            "condition": "Dịu mát"
+        }
+    },
+    "Hue": {
+        "tomorrow": {
+            "temp": 34,
+            "condition": "Mây"
+        },
+        "day_after": {
+            "temp": 25,
+            "condition": "Nắng"
+        }
+    },
+    "PhuQuoc": {
+        "tomorrow": {
+            "temp": 31,
+            "condition": "Mưa nhẹ"
+        },
+        "day_after": {
+            "temp": 30,
+            "condition": "Nắng"
+        }
+    }
+}

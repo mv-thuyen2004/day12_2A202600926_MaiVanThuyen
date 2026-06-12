@@ -1,0 +1,55 @@
+{
+    "DaNang": [
+        {
+            "name": "Chùa Linh Ứng",
+            "tags": [
+                "accessible",
+                "no_climbing"
+            ],
+            "desc": "Tượng Phật lớn, cảnh biển đẹp."
+        },
+        {
+            "name": "Bà Nà Hills",
+            "tags": [
+                "scenic",
+                "climbing"
+            ],
+            "desc": "Cáp treo dài, kiến trúc Pháp."
+        }
+    ],
+    "HaNoi": [
+        {
+            "name": "Hồ Hoàn Kiếm",
+            "tags": [
+                "accessible",
+                "cultural"
+            ],
+            "desc": "Trái tim thủ đô, đi bộ thư giãn."
+        },
+        {
+            "name": "Lăng Bác",
+            "tags": [
+                "cultural"
+            ],
+            "desc": "Di tích lịch sử quan trọng."
+        }
+    ],
+    "Hue": [
+        {
+            "name": "Đại Nội",
+            "tags": [
+                "cultural",
+                "walking"
+            ],
+            "desc": "Cung điện cổ kính, di sản thế giới."
+        },
+        {
+            "name": "Chùa Thiên Mụ",
+            "tags": [
+                "accessible",
+                "cultural"
+            ],
+            "desc": "Biểu tượng tâm linh ven sông Hương."
+        }
+    ]
+}

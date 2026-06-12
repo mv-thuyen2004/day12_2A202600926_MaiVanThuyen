@@ -1,0 +1,34 @@
+{
+    "DaNang": [
+        {
+            "size": "7_seater",
+            "price": 1200000
+        },
+        {
+            "size": "16_seater",
+            "price": 1800000
+        }
+    ],
+    "HaNoi": [
+        {
+            "size": "4_seater",
+            "price": 1000000
+        },
+        {
+            "size": "7_seater",
+            "price": 1500000
+        }
+    ],
+    "Hue": [
+        {
+            "size": "7_seater",
+            "price": 1000000
+        }
+    ],
+    "PhuQuoc": [
+        {
+            "size": "7_seater",
+            "price": 1500000
+        }
+    ]
+}
