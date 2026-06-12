@@ -1,22 +1,22 @@
 # Deployment Information
 
 ## Public URL
-https://day12-agent-deployment-production-c22f.up.railway.app
+https://production-agent-28ld.onrender.com/
 
 ## Platform
-Railway
+Render
 
 ## Test Commands
 
 ### Health Check
 ```bash
-curl https://day12-agent-deployment-production-c22f.up.railway.app/health
+curl https://production-agent-28ld.onrender.com/health
 # Expected: {"status": "ok", ...}
 ```
 
 ### API Test (with authentication)
 ```bash
-curl -X POST https://day12-agent-deployment-production-c22f.up.railway.app/ask \
+curl -X POST https://production-agent-28ld.onrender.com/ask \
   -H "X-API-Key: secret-key-123" \
   -H "Content-Type: application/json" \
   -d "{\"user_id\": \"test_user\", \"question\": \"What is Docker?\"}"
@@ -25,7 +25,7 @@ curl -X POST https://day12-agent-deployment-production-c22f.up.railway.app/ask \
 ### Rate Limiting Test (Spam requests to trigger 429)
 ```bash
 for i in {1..12}; do
-  curl -s -X POST https://day12-agent-deployment-production-c22f.up.railway.app/ask \
+  curl -s -X POST https://production-agent-28ld.onrender.com/ask \
     -H "X-API-Key: secret-key-123" \
     -H "Content-Type: application/json" \
     -d "{\"user_id\": \"test_user\", \"question\": \"test $i\"}"

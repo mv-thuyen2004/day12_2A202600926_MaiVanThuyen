@@ -39,8 +39,8 @@
 
 ## Part 3: Cloud Deployment
 
-### Exercise 3.1: Railway deployment
-- **URL:** https://day12-agent-deployment-production-c22f.up.railway.app
+### Exercise 3.1: Railway/Render deployment
+- **URL:** https://production-agent-28ld.onrender.com/
 - **Screenshot:** [Link to screenshots in screenshots/ folder](screenshots/deployment_railway.png)
 
 ---
