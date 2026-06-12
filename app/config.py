@@ -14,7 +14,7 @@ class Settings:
 
     # App
     app_name: str = field(default_factory=lambda: os.getenv("APP_NAME", "Production AI Agent"))
-    app_version: str = field(default_factory=lambda: os.getenv("APP_VERSION", "1.0.0"))
+    app_version: str = field(default_factory=lambda: os.getenv("APP_VERSION", "1.0.1"))
 
     # LLM
     openai_api_key: str = field(default_factory=lambda: os.getenv("OPENAI_API_KEY", ""))
