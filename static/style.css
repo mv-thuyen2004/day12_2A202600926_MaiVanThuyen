@@ -1,0 +1,115 @@
+/* Tổng quan */
+:root {
+    --primary-color: #4a90e2;
+    --bg-color: #f4f7f6;
+    --chat-bubble-user: #e1f5fe;
+    --chat-bubble-agent: #ffffff;
+}
+
+body { 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+    background-color: var(--bg-color); 
+    margin: 0; 
+    padding: 20px; 
+}
+
+/* Container chính */
+.main-container {
+    max-width: 800px;
+    margin: auto;
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+}
+
+/* Panel nhập liệu */
+.control-panel {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+input {
+    flex: 1;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    outline: none;
+}
+
+button {
+    padding: 10px 20px;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+button:disabled { background: #ccc; }
+
+/* Styling cho kết quả */
+.box {
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 10px;
+    background: #fdfdfd;
+    border: 1px solid #eee;
+}
+
+.content {
+    white-space: pre-wrap;
+    line-height: 1.6;
+    color: #333;
+}
+
+/* Styling cho phần Trace */
+.trace-container { margin-top: 20px; }
+
+.trace-step { 
+    background: #fff; 
+    border: 1px solid #d1d9e6; 
+    border-radius: 8px; 
+    margin-bottom: 10px; 
+    transition: all 0.3s ease;
+}
+
+.trace-step summary { 
+    padding: 12px; 
+    cursor: pointer; 
+    font-weight: 600;
+    color: #444;
+    list-style: none; /* Ẩn dấu mũi tên mặc định */
+}
+
+/* Thêm icon mũi tên cho summary */
+.trace-step summary::after {
+    content: '▼';
+    float: right;
+    font-size: 0.8em;
+    color: #999;
+}
+
+.trace-step[open] summary::after {
+    content: '▲';
+}
+
+.step-content { 
+    padding: 15px; 
+    border-top: 1px solid #eee; 
+    background: #fafafa;
+    font-size: 0.95em;
+}
+
+/* Styling Metrics */
+.metrics-box {
+    background: #eef9f0;
+    color: #2e7d32;
+    padding: 8px;
+    border-radius: 6px;
+    text-align: center;
+    font-size: 0.85em;
+    border: 1px solid #c8e6c9;
+}

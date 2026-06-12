@@ -24,6 +24,10 @@ COPY --from=builder /usr/local /usr/local
 # Copy application
 COPY app/ ./app/
 COPY utils/ ./utils/
+COPY src/ ./src/
+COPY data/ ./data/
+COPY static/ ./static/
+COPY templates/ ./templates/
 
 RUN chown -R agent:agent /app
 

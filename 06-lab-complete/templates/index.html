@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Travel Agent AI</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        /* CSS nội bộ bổ sung cho giao diện chatbot */
+        .chat-container { max-width: 800px; margin: auto; padding: 20px; }
+        .trace-container { margin-top: 20px; }
+        
+        .trace-step { 
+            background: #f8f9fa; 
+            border: 1px solid #dee2e6; 
+            border-radius: 8px; 
+            margin-bottom: 10px; 
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+        .trace-step summary { 
+            padding: 15px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            background: #e9ecef; 
+            list-style: none;
+            display: flex;
+            justify-content: space-between;
+        }
+        .trace-step summary::after { content: '▼'; color: #666; }
+        .trace-step[open] summary::after { content: '▲'; }
+        
+        .step-content { padding: 15px; border-top: 1px solid #dee2e6; background: #fff; }
+        .metrics-box { 
+            background: #d1ecf1; color: #0c5460; 
+            padding: 10px; margin: 10px 0; border-radius: 5px; 
+            font-size: 0.9em; text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1 style="text-align: center;">AI Travel Agent Control</h1>
+    
+    <div class="chat-container">
+        <div class="control-panel" style="margin-bottom: 15px; display: flex; gap: 10px;">
+            <input type="password" id="apiKeyInput" placeholder="X-API-Key" value="secret-key-123" style="max-width: 150px; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+            <input type="text" id="userInput" placeholder="Hôm nay bạn muốn đi đâu?" style="flex-grow: 1; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+            <button id="btn" onclick="askAgent()" style="padding: 8px 16px; border: none; border-radius: 4px; background-color: #007bff; color: white; cursor: pointer;">Gửi yêu cầu</button>
+        </div>
+        
+        <div id="loading" style="display:none; text-align:center; margin: 10px;">Đang suy nghĩ... Hệ thống đang chạy ReAct Loop...</div>
+        
+        <div class="box" id="resultBox">
+            <h3>Kết quả thiết kế lịch trình</h3>
+            <div class="content" id="finalAnswer"></div>
+        </div>
+
+        <div id="metrics" class="metrics-box" style="display:none;"></div>
+        <div id="traceContainer" class="trace-container"></div>
+    </div>
+
+    <script>
+        async function askAgent() {
+            const btn = document.getElementById('btn');
+            const loading = document.getElementById('loading');
+            const finalAnswer = document.getElementById('finalAnswer');
+            const traceContainer = document.getElementById('traceContainer');
+            const metricsDiv = document.getElementById('metrics');
+            const apiKey = document.getElementById('apiKeyInput').value;
+
+            // Reset trạng thái
+            btn.disabled = true;
+            loading.style.display = 'block';
+            finalAnswer.innerText = "Đang kết nối với AI...";
+            traceContainer.innerHTML = "";
+            metricsDiv.style.display = 'none';
+
+            try {
+                const res = await fetch('/ask', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-API-Key': apiKey
+                    },
+                    body: JSON.stringify({
+                        question: document.getElementById('userInput').value,
+                        user_id: 'web_client'
+                    })
+                });
+                
+                const data = await res.json();
+                
+                if (res.status === 401) {
+                    finalAnswer.innerHTML = "<span style='color: red;'>❌ Lỗi xác thực: Sai X-API-Key!</span>";
+                    return;
+                } else if (res.status === 429) {
+                    finalAnswer.innerHTML = "<span style='color: red;'>❌ Lỗi: Bạn đã vượt quá giới hạn 10 requests/phút (Rate Limit)!</span>";
+                    return;
+                } else if (res.status === 402) {
+                    finalAnswer.innerHTML = "<span style='color: red;'>❌ Lỗi: Đã vượt quá ngân sách chi tiêu của tài khoản (Cost Guard)!</span>";
+                    return;
+                }
+                
+                // 1. Hiển thị kết quả
+                finalAnswer.innerText = data.answer || "Không có phản hồi từ Agent.";
+
+                // 2. Hiển thị Metrics
+                if (data.metrics) {
+                    metricsDiv.style.display = 'block';
+                    metricsDiv.innerText = `Số bước thực hiện: ${data.metrics.steps} | Độ trễ: ${data.metrics.latency_ms}ms`;
+                }
+                
+                // 3. Render Trace dạng Accordion
+                if (data.trace && Array.isArray(data.trace)) {
+                    traceContainer.innerHTML = "<h3>Chi tiết tiến trình (Click để xem):</h3>" + data.trace.map((step, index) => `
+                        <details class="trace-step">
+                            <summary>
+                                <span>Bước ${index + 1}: ${step.action !== 'None' ? 'Đã gọi ' + step.action : 'Suy nghĩ'}</span>
+                            </summary>
+                            <div class="step-content">
+                                <p>💡 <b>Thought:</b> ${step.thought || 'Không có'}</p>
+                                <p>⚙️ <b>Action:</b> ${step.action || 'None'}</p>
+                                <p>👁️ <b>Observation:</b> ${step.observation || 'None'}</p>
+                            </div>
+                        </details>
+                    `).join('');
+                }
+            } catch (error) {
+                finalAnswer.innerText = "Lỗi kết nối tới Server. Vui lòng kiểm tra lại.";
+                console.error(error);
+            } finally {
+                btn.disabled = false;
+                loading.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

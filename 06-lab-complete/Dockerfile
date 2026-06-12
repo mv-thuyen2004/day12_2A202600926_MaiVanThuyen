@@ -1,7 +1,3 @@
-# ============================================================
-# Production Dockerfile — Multi-stage, < 500 MB, non-root
-# ============================================================
-
 # Stage 1: Builder
 FROM python:3.11-slim AS builder
 
@@ -11,29 +7,32 @@ RUN apt-get update && apt-get install -y gcc libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
-RUN pip install --no-cache-dir --user -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 
 # Stage 2: Runtime
 FROM python:3.11-slim AS runtime
 
-# Non-root user
+# Tạo non-root user agent sạch
 RUN groupadd -r agent && useradd -r -g agent -d /app agent
 
 WORKDIR /app
 
-# Copy packages từ builder
-COPY --from=builder /root/.local /home/agent/.local
+# Copy python packages toàn hệ thống từ builder
+COPY --from=builder /usr/local /usr/local
 
 # Copy application
 COPY app/ ./app/
 COPY utils/ ./utils/
+COPY src/ ./src/
+COPY data/ ./data/
+COPY static/ ./static/
+COPY templates/ ./templates/
 
 RUN chown -R agent:agent /app
 
 USER agent
 
-ENV PATH=/home/agent/.local/bin:$PATH
 ENV PYTHONPATH=/app
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1

@@ -9,6 +9,8 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException, Security, Depends, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, Field
 import uvicorn
 
@@ -16,7 +18,7 @@ from app.config import settings
 from app.auth import verify_api_key
 from app.rate_limiter import check_rate_limit
 from app.cost_guard import check_budget, record_cost, get_current_cost, PRICE_PER_1K_INPUT_TOKENS, PRICE_PER_1K_OUTPUT_TOKENS
-from utils.mock_llm import ask as llm_ask
+from app.agent_runner import run_agent
 
 # Logging — JSON structured
 logging.basicConfig(
@@ -81,12 +83,17 @@ app = FastAPI(
     redoc_url=None,
 )
 
+# Cấu hình CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.allowed_origins,
     allow_methods=["GET", "POST"],
     allow_headers=["Authorization", "Content-Type", "X-API-Key"],
 )
+
+# Cấu hình phục vụ các tệp tĩnh static
+if os.path.exists("static"):
+    app.mount("/static", StaticFiles(directory="static"), name="static")
 
 @app.middleware("http")
 async def request_middleware(request: Request, call_next):
@@ -121,19 +128,17 @@ class AskResponse(BaseModel):
     answer: str
     model: str
     timestamp: str
+    trace: list | None = None
+    metrics: dict | None = None
 
-@app.get("/", tags=["Info"])
+@app.get("/", response_class=HTMLResponse, tags=["Info"])
 def root():
-    return {
-        "app": settings.app_name,
-        "version": settings.app_version,
-        "environment": settings.environment,
-        "endpoints": {
-            "ask": "POST /ask (requires X-API-Key)",
-            "health": "GET /health",
-            "ready": "GET /ready",
-        },
-    }
+    """Trả về giao diện chat HTML/CSS thay vì JSON raw"""
+    try:
+        with open("templates/index.html", "r", encoding="utf-8") as f:
+            return HTMLResponse(content=f.read())
+    except Exception as e:
+        return HTMLResponse(content=f"<h1>Error loading index.html: {str(e)}</h1>")
 
 @app.post("/ask", response_model=AskResponse, tags=["Agent"])
 async def ask_agent(
@@ -158,25 +163,12 @@ async def ask_agent(
         "client": str(request.client.host) if request.client else "unknown",
     }))
 
-    # 3. Load conversation history
-    history = load_history(user_id)
-
-    # Smart response matching based on history
-    question_lower = body.question.lower()
-    if "what is my name" in question_lower:
-        answer = "I don't know your name yet."
-        for msg in reversed(history):
-            content = msg.get("content", "").lower()
-            if "my name is" in content:
-                parts = content.split("my name is")
-                if len(parts) > 1:
-                    name = parts[1].strip().title().rstrip(".!?")
-                    answer = f"Your name is {name}."
-                    break
-    else:
-        answer = llm_ask(body.question)
+    # 3. Chạy ReAct Agent (chạy thật hoặc chạy giả lập mock offline)
+    result = run_agent(body.question)
+    answer = result.get("final_answer", "")
 
     # 4. Save history
+    history = load_history(user_id)
     history.append({"role": "user", "content": body.question})
     history.append({"role": "assistant", "content": answer})
     if len(history) > 20:
@@ -193,6 +185,8 @@ async def ask_agent(
         answer=answer,
         model=settings.llm_model,
         timestamp=datetime.now(timezone.utc).isoformat(),
+        trace=result.get("trace", []),
+        metrics=result.get("metrics", {"steps": 0, "latency_ms": 0})
     )
 
 @app.get("/health", tags=["Operations"])
